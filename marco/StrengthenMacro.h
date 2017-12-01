@@ -12,7 +12,7 @@
 /**
  
  实例:传入三个参数:a, b, c
- JK_Add_SubView(supperView, a, b, c)
+ JK_Prepare_Subviews(supperView, a, b, c)
  
  #define JK_Prepare_Subviews(supperView, ...)\
  JK_metamacro_foreach(JK_metamacro_foreach, supperView, __VA_ARGS__)
