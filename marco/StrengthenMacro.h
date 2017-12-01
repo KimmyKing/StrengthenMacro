@@ -14,16 +14,16 @@
  实例:传入三个参数:a, b, c
  JK_Add_SubView(supperView, a, b, c)
  
- #define JK_Add_SubView(supperView, ...)\
- JK_metamacro_foreach(JK_Prepare_Subview, supperView, __VA_ARGS__)
+ #define JK_Prepare_Subviews(supperView, ...)\
+ JK_metamacro_foreach(JK_metamacro_foreach, supperView, __VA_ARGS__)
  第一次展开
- JK_metamacro_foreach(JK_Prepare_Subview, supperView, a, b, c)
+ JK_metamacro_foreach(JK_metamacro_foreach, supperView, a, b, c)
  
  
  #define JK_metamacro_foreach(Marco, supperView, ...)\
  JK_metamacro_concat(JK_metamacro_foreach, JK_metamacro_argcount(__VA_ARGS__))(Marco, supperView, __VA_ARGS__)
  第二次展开
- JK_metamacro_concat(JK_metamacro_foreach, JK_metamacro_argcount(a, b, c))(JK_Prepare_Subview, supperView, a, b, c)
+ JK_metamacro_concat(JK_metamacro_foreach, JK_metamacro_argcount(a, b, c))(JK_Add_Subview, supperView, a, b, c)
  
  参数中的宏展开
  #define JK_metamacro_argcount(...) \
@@ -44,41 +44,48 @@
  #define JK_metamacro_concat(A, B) \
  JK_metamacro_concat_(A, B)
  第三次展开
- JK_metamacro_concat_(JK_metamacro_foreach, 3)(JK_Prepare_Subview, supperView, a, b, c)
+ JK_metamacro_concat_(JK_metamacro_foreach, 3)(JK_Add_Subview, supperView, a, b, c)
  
  
- #define JK_metamacro_concat_(A, B) A ## B
+ #define JK_metamacro_concat_(A, B) A ## B      //拼接宏,结果为AB
  第四次展开
- JK_metamacro_foreach3(JK_Prepare_Subview, supperView, a, b, c)
+ JK_metamacro_foreach3(JK_Add_Subview, supperView, a, b, c)
  
  
  #define JK_metamacro_foreach3(Marco, Parameter, _0, _1, _2)\
  JK_metamacro_foreach2(Marco, Parameter, _0, _1)\
  Marco(Parameter, _2, 2)
  第五次展开
- JK_metamacro_foreach2(JK_Prepare_Subview, supperView, a, b)
- JK_Prepare_Subview(supperView, c)
+ JK_metamacro_foreach2(JK_Add_Subview, supperView, a, b)
+ JK_Add_Subview(supperView, c)
  
  
  #define JK_metamacro_foreach2(Marco, Parameter, _0, _1)\
  JK_metamacro_foreach1(Marco, Parameter, _0)\
  Marco(Parameter, _1, 1)
  第六次展开
- JK_metamacro_foreach1(JK_Prepare_Subview, supperView, a)
- JK_Prepare_Subview(supperView, b)
- JK_Prepare_Subview(supperView, c)
+ JK_metamacro_foreach1(JK_Add_Subview, supperView, a)
+ JK_Add_Subview(supperView, b)
+ JK_Add_Subview(supperView, c)
  
  
  第七次展开
- JK_Prepare_Subview(supperView, a)
- JK_Prepare_Subview(supperView, b)
- JK_Prepare_Subview(supperView, c)
+ JK_Add_Subview(supperView, a)
+ JK_Add_Subview(supperView, b)
+ JK_Add_Subview(supperView, c)
  
  */
 
 
-#define JK_Add_SubView(supperView, ...)\
-JK_metamacro_foreach(JK_Prepare_Subview, supperView, __VA_ARGS__)
+
+/**
+ 传入N个(N<=20)子视图添加到supperView上
+ 
+ @param supperView 父视图
+ @param ... N个子视图
+ */
+#define JK_Prepare_Subviews(supperView, ...)\
+JK_metamacro_foreach(JK_Add_Subview, supperView, __VA_ARGS__)
 
 #define JK_metamacro_foreach(Marco, supperView, ...)\
 JK_metamacro_concat(JK_metamacro_foreach, JK_metamacro_argcount(__VA_ARGS__))(Marco, supperView, __VA_ARGS__)
@@ -162,14 +169,15 @@ Marco(Parameter, _1, 1)
 #define JK_metamacro_foreach1(Marco, Parameter, _0)\
 Marco(Parameter, _0, 0)
 
-#define JK_Prepare_Subview(supperView, suberView, Index)\
+#define JK_Add_Subview(supperView, suberView, Index)\
 [supperView addSubview:suberView];
 
 #define JK_metamacro_concat(A, B) \
 JK_metamacro_concat_(A, B)
 
-#define JK_metamacro_concat_(A, B) A ## B
+#define JK_metamacro_concat_(A, B) A ## B //表示连接A和B,结果是AB
 
+//传入N个参数,获得参数的个数: N
 #define JK_metamacro_argcount(...) \
 JK_metamacro_at(20, __VA_ARGS__, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
 
@@ -185,3 +193,4 @@ JK_metamacro_head_(__VA_ARGS__, 0)
 #define JK_metamacro_head_(FIRST, ...) FIRST
 
 #endif /* StrengthenMacro_h */
+
